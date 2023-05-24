@@ -1,7 +1,7 @@
 #include"bmp2yuv.h"
 #include<string.h> 
 
-unsigned char* bmp2yuv_down() {
+unsigned char* bmp2yuv() {
     
     BITMAPFILEHEADER_  fileHeader;
     BITMAPINFOHEADER_  infoHeader;
@@ -13,7 +13,7 @@ unsigned char* bmp2yuv_down() {
     FILE *input_fp  = fopen(input_filename, "rb");
     FILE *output_fp = fopen(output_filename, "ab+");
 
-    //Ñ¡ÔñÊä³öÎÄ¼ş´ò¿ªÄ£Ê½£¬µÚÒ»´Î´ò¿ªÄ£Ê½Îªwb+£¬Ç¿ÖÆ¸²¸Ç outputFile¡£Ö®ºóÎªab+£¬ÔÚÄÚÈİºóÃæ×·¼Ó
+    //é€‰æ‹©è¾“å‡ºæ–‡ä»¶æ‰“å¼€æ¨¡å¼ï¼Œç¬¬ä¸€æ¬¡æ‰“å¼€æ¨¡å¼ä¸ºwb+ï¼Œå¼ºåˆ¶è¦†ç›– outputFileã€‚ä¹‹åä¸ºab+ï¼Œåœ¨å†…å®¹åé¢è¿½åŠ 
     int n = 0;
     
     int frames  = 1;
@@ -31,25 +31,25 @@ unsigned char* bmp2yuv_down() {
     
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < width; i++) {
-            //BMPÏñËØÊı¾İµÄ±£´æË³ĞòÎª×óÏÂµ½ÓÒÉÏ£¬×ª»»³ÉYUVÎÄ¼şÊ±ĞèÒªµ÷ÕûÊı¾İË³Ğò
+            //BMPåƒç´ æ•°æ®çš„ä¿å­˜é¡ºåºä¸ºå·¦ä¸‹åˆ°å³ä¸Šï¼Œè½¬æ¢æˆYUVæ–‡ä»¶æ—¶éœ€è¦è°ƒæ•´æ•°æ®é¡ºåº
             int real_j = height - 1 - j;
             int B, G, R;
-            //ÈôÓĞµ÷É«°å£¬¶ÁÈ¡µ÷É«°åRGBÖµ
+            //è‹¥æœ‰è°ƒè‰²æ¿ï¼Œè¯»å–è°ƒè‰²æ¿RGBå€¼
             if (colors != 0) {
                 B = quad[*(input_buffer + width * j + i)].rgbBlue_;
                 G = quad[*(input_buffer + width * j + i)].rgbGreen_;
                 R = quad[*(input_buffer + width * j + i)].rgbRed_;
             }
-            //ÈôÃ»ÓĞµ÷É«°å£¬Ö±½Ó¶ÁÈ¡RGBÖµ
+            //è‹¥æ²¡æœ‰è°ƒè‰²æ¿ï¼Œç›´æ¥è¯»å–RGBå€¼
             else {
                 B = *(input_buffer + (width * j + i) * 3);
                 G = *(input_buffer + (width * j + i) * 3 + 1);
                 R = *(input_buffer + (width * j + i) * 3 + 2);
             }
-            //¼ÆËãÁÁ¶ÈY
+            //è®¡ç®—äº®åº¦Y
             int Y                                 = 0.299 * R + 0.587 * G + 0.114 * B;
             *(output_buffer + width * real_j + i) = Y;
-            //Êä³öYUVÍ¼Ïñ¸ñÊ½Îª4:2:0²ÉÑù£¬¼´Ã¿4¸öÏñËØµã²É¼¯Ò»´ÎÉ«¶ÈÖµ
+            //è¾“å‡ºYUVå›¾åƒæ ¼å¼ä¸º4:2:0é‡‡æ ·ï¼Œå³æ¯4ä¸ªåƒç´ ç‚¹é‡‡é›†ä¸€æ¬¡è‰²åº¦å€¼
             if (real_j % 2 == 0 && i % 2 == 0) {
                 int U = -0.1684 * R - 0.3316 * G + 0.5 * B + 128;
                 int V = 0.5 * R - 0.4187 * G - 0.0813 * B + 128;
@@ -58,11 +58,11 @@ unsigned char* bmp2yuv_down() {
             }
         }
     }
-    //Ô­Ê¼Í¼Ïñ
+    //åŸå§‹å›¾åƒ
     fwrite(output_buffer, 1, width * height * 3 / 2, output_fp);
 
 
-    //ÊÍ·ÅÄÚ´æ£¬¹Ø±ÕÎÄ¼ş
+    //é‡Šæ”¾å†…å­˜ï¼Œå…³é—­æ–‡ä»¶
     free(input_buffer);
     fclose(input_fp);
     fclose(output_fp);
@@ -73,6 +73,6 @@ unsigned char* bmp2yuv_down() {
 int main(){
 	char filename[] = "main_output_file.yuv";
 	FILE *file = fopen(filename, "wb+");
-	unsigned char* buf = bmp2yuv_down();
+	unsigned char* buf = bmp2yuv();
 	fwrite(buf, 1, 640 * 480 * 3 / 2, file);
 }
